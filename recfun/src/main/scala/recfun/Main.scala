@@ -23,7 +23,15 @@ object Main {
   /**
    * Exercise 2
    */
-  def balance(chars: List[Char]): Boolean = ???
+  def balance(chars: List[Char]): Boolean = {
+    def balanceOfTail(balance : Int, chars: List[Char]) : Int ={
+      val balance = if (chars.head == '(' balance+1 else if chars.head==')' balance-1 else 0
+      // TODO: handling negative balance, return with constant -1?
+      if (chars.isEmpty) balance else balanceOfTail(balance, chars.tail)
+    }
+    
+    balanceOfTail(0, chars) == 0
+  }
 
   /**
    * Exercise 3
