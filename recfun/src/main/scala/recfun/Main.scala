@@ -14,7 +14,11 @@ object Main {
   /**
    * Exercise 1
    */
-  def pascal(c: Int, r: Int): Int = ???
+  def pascal(c: Int, r: Int): Int = {
+    if(c>r) throw new IllegalArgumentException("Column number can't be greater than row number")
+    def pascalUp(c: Int, r: Int): Int = if (c<0 || r<0) 0 else  pascalUp(c-1,r-1)+pascalUp(c,r-1)
+    pascalUp(c,r)
+  }
 
   /**
    * Exercise 2
