@@ -16,12 +16,28 @@ class BalanceSuite extends FunSuite {
   test("balance: 'I told him ...' is balanced") {
     assert(balance("I told him (that it's not (yet) done).\n(But he wasn't listening)".toList))
   }
+  
+  test("balance: '(())' is balanced") {
+    assert(balance("(())".toList))
+  }
+   
+  test("balance: '(()' is unbalanced") {
+    assert(!balance("(()".toList))
+  }
 
   test("balance: ':-)' is unbalanced") {
     assert(!balance(":-)".toList))
   }
 
-  test("balance: counting is not enough") {
+  test("balance: counting is not enough when ends with open par") {
     assert(!balance("())(".toList))
+  }
+  
+   test("balance: counting is not enough where closed par when no open par") {
+    assert(!balance("())(()".toList))
+  }
+   
+    test("balance: counting is not enough when starts with close par") {
+    assert(!balance(")(()".toList))
   }
 }
