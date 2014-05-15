@@ -1,9 +1,9 @@
 package objsets
 
 import org.scalatest.FunSuite
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import java.util.NoSuchElementException
 
 @RunWith(classOf[JUnitRunner])
 class TweetSetSuite extends FunSuite {
@@ -43,6 +43,12 @@ class TweetSetSuite extends FunSuite {
       assert(size(set5.filter(tw => tw.retweets == 20)) === 2)
     }
   }
+  
+  test("filter: all on set5") {
+    new TestSets {
+      assert(size(set5.filter(tw => true)) === 4)
+    }
+  }
 
   test("union: set4c and set4d") {
     new TestSets {
@@ -61,12 +67,24 @@ class TweetSetSuite extends FunSuite {
       assert(size(set1.union(set5)) === 4)
     }
   }
-
-  test("descending: set5") {
-    new TestSets {
-      val trends = set5.descendingByRetweet
-      assert(!trends.isEmpty)
-      assert(trends.head.user == "a" || trends.head.user == "b")
+  
+  test("mostRetweeted on emptySet throws exception") {
+    intercept[NoSuchElementException] {
+    	(new Empty).mostRetweeted
     }
   }
+  
+  test("mostRetweeted on set returns most tweeted") {
+     new TestSets {
+      assert(set5.mostRetweeted.retweets === 20)
+    }
+  }
+
+//  test("descending: set5") {
+//    new TestSets {
+//      val trends = set5.descendingByRetweet
+//      assert(!trends.isEmpty)
+//      assert(trends.head.user == "a" || trends.head.user == "b")
+//    }
+//  }
 }
