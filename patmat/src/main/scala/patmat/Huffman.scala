@@ -77,19 +77,17 @@ object Huffman {
    *       println("integer is  : "+ theInt)
    *   }
    */
-  def times(chars: List[Char]): List[(Char, Int)] =  {
-     
-    case  Nil => Nil
-    case chars => {
-      append(chars.head, times(chars.head, chars.tail)) 
-    }  
-    
+  def times(chars: List[Char]): List[(Char, Int)] = timesAcc(chars, Nil)  
+  
+  private def timesAcc(chars: List[Char], acc: List[(Char, Int)]): List[(Char, Int)] = chars match {     
+    case Nil => acc
+    case chars => timesAcc(chars.tail, append(chars.head, acc))
   }
   
-  def append(char: Char, counts: List[(Char, Int)]): List[(Char, Int)] = counts match {
+  private def append(char: Char, counts: List[(Char, Int)]): List[(Char, Int)] = counts match {
     case Nil => List((char, 1))
-    case (char, count) :: tail => (char, count+1) :: tail
-    case head :: tail =>  head :: append(char, tail)
+    case (c, count) :: tail if (c == char) =>  (c, count+1) :: tail
+    case head :: tail =>  head :: append(char, tail)    
   }
 
   /**
@@ -99,12 +97,14 @@ object Huffman {
    * head of the list should have the smallest weight), where the weight
    * of a leaf is the frequency of the character.
    */
-  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
+  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = 
+		  freqs.sortWith(_._2 < _._2).map(elem => new Leaf(elem._1, elem._2))
+
 
   /**
    * Checks whether the list `trees` contains only one single code tree.
    */
-  def singleton(trees: List[CodeTree]): Boolean = ???
+  def singleton(trees: List[CodeTree]): Boolean = trees.size == 1
 
   /**
    * The parameter `trees` of this function is a list of code trees ordered
@@ -118,8 +118,31 @@ object Huffman {
    * If `trees` is a list of less than two elements, that list should be returned
    * unchanged.
    */
-  def combine(trees: List[CodeTree]): List[CodeTree] = ???
-
+  def combine(trees: List[CodeTree]): List[CodeTree] = 
+    	if(trees.size < 2) trees else fork(trees.head, trees.tail.head) :: trees.drop(2)
+  
+  
+  private def fork(first: CodeTree, second: CodeTree): Fork = (first, second) match {
+    case (Leaf(char1, weight1), Leaf(char2, weight2)) => new Fork(first, second, List(char1, char2), weight1 + weight2)    
+    case (Leaf(char1, weight1), Fork(_,_,chars2, weight2)) => new Fork(first, second, char1 :: chars2, weight1 + weight2) 
+    case (Fork(_,_,chars1, weight1), Leaf(char2, weight2)) => new Fork(first, second, char2 :: chars1, weight1 + weight2)
+    case (Fork(_,_,chars1, weight1), Fork(_,_,chars2, weight2)) => new Fork(first, second, chars1 ::: chars2, weight1 + weight2)
+  }
+  
+//  def combine2(trees: List[CodeTree]): List[CodeTree] = trees match {
+//    case Nil => trees
+//    case head :: Nil => trees
+//    case (first @Leaf(char1, weight1)) :: (second @Leaf(char2, weight2)) :: tail 
+//    					=> new Fork(first, second, List(char1, char2), weight1 + weight2) :: tail
+//    case (first @Leaf(char1, weight1)) :: (second @Fork(_,_,chars2, weight2)) :: tail 
+//    					=> new Fork(first, second, char1 :: chars2, weight1 + weight2)  :: tail 
+//    case (first @Fork(_,_,chars1, weight1)) :: (second @Leaf(char2, weight2)) :: tail 
+//    					=> new Fork(first, second, char2 :: chars1, weight1 + weight2) :: tail 
+//    case (first @Fork(_,_,chars1, weight1)) :: (second @Fork(_,_,chars2, weight2)) :: tail 
+//    					=> new Fork(first, second, chars1 ::: chars2, weight1 + weight2) :: tail 
+// 
+//  }
+  
   /**
    * This function will be called in the following way:
    *
