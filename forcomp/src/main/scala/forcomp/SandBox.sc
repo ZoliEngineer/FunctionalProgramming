@@ -6,14 +6,24 @@ object SandBox {
   println("Welcome to the Scala worksheet")       //> Welcome to the Scala worksheet
   
   
- val x = wordOccurrences("abbc")                  //> x  : forcomp.Anagrams.Occurrences = List((a,1), (b,2), (c,1))
- val y = wordOccurrences("ab")                    //> y  : forcomp.Anagrams.Occurrences = List((a,1), (b,1))
+ val x = wordOccurrences("xabbc")                 //> x  : forcomp.Anagrams.Occurrences = List((a,1), (b,2), (c,1), (x,1))
+ val y = wordOccurrences("sab")                   //> y  : forcomp.Anagrams.Occurrences = List((a,1), (b,1), (s,1))
         
+
+ def subtract(xs: Occurrences, ys: Occurrences): Occurrences = (xs, ys) match{
+ 	case(Nil, ys) => ys
+ 	case(xs, Nil) => xs
+ 	case(x::xt, y::yt) =>
+ 		if (x._1 == y._1) (x._1, x._2 - y._2) :: subtract(xt, yt)
+ 		else x :: subtract(xt, ys)
+ }                                                //> subtract: (xs: forcomp.Anagrams.Occurrences, ys: forcomp.Anagrams.Occurrence
+                                                  //| s)forcomp.Anagrams.Occurrences
         
- val trivial = x.filterNot(occurence => y.contains(occurence))
-                                                  //> trivial  : List[(Char, Int)] = List((b,2), (c,1))
+  
  
- trivial.filter(xoccurence => y.exists(yoccurence => xoccurence._1 == yoccurence._1 ))
-                                                  //> res0: List[(Char, Int)] = List((b,2))
+ 	subtract(x,y)                             //> res0: forcomp.Anagrams.Occurrences = List((a,0), (b,1), (c,1), (x,1), (s,1))
+                                                  //| 
+
+
  
 }

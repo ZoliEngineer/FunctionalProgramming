@@ -116,8 +116,18 @@ object Anagrams {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = 
-    x.filterNot(occurence => y.contains(occurence))
+   def subtract(x: Occurrences, y: Occurrences): Occurrences = diff(x,y) ::: sub(x,y) sorted
+        
+   private def diff(x: Occurrences, y: Occurrences): Occurrences =
+    	x.filterNot(occurence => y.exists( occ => occ._1 == occurence._1))
+                                                  //> diff: (x: forcomp.Anagrams.Occurrences, y: forcomp.Anagrams.Occurrences)forc
+                                                  //| omp.Anagrams.Occurrences
+   private def sub(x: Occurrences, y: Occurrences): Occurrences =
+    	for {
+			minuend <- x
+			subtrahend <- y
+			if (minuend._1 == subtrahend._1 && minuend._2 != subtrahend._2)
+		} yield (minuend._1, minuend._2 - subtrahend._2)
 
   /** Returns a list of all anagram sentences of the given sentence.
    *  
