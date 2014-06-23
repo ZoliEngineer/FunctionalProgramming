@@ -34,7 +34,7 @@ object Anagrams {
    *  same character, and are represented as a lowercase character in the occurrence list.
    */
   def wordOccurrences(w: Word): Occurrences = 
-    w.toLowerCase().toList.groupBy((element: Char) => element).map(char => (char._1, char._2.length)).toList.sorted
+    w.toLowerCase().groupBy(identity).map(char => (char._1, char._2.length)).toList.sorted
 
   /** Converts a sentence into its character occurrence list. */
   def sentenceOccurrences(s: Sentence): Occurrences = wordOccurrences(s.mkString)
@@ -54,15 +54,10 @@ object Anagrams {
    *    List(('a', 1), ('e', 1), ('t', 1)) -> Seq("ate", "eat", "tea")
    *
    */
-  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = 
-    dictionary.map(word => (wordOccurrences(word), word)).groupBy(x => x._1).mapValues(list => list.map(l => l._2)).withDefaultValue(Nil)
+  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = dictionary groupBy wordOccurrences
 
   /** Returns all the anagrams of a given word. */
-  def wordAnagrams(word: Word): List[Word] = dictionaryByOccurrences.get(wordOccurrences(word)) match {
-      case Some(value) => value
-      case None => Nil
-    }
-  
+  def wordAnagrams(word: Word): List[Word] = dictionaryByOccurrences.getOrElse(wordOccurrences(word), Nil)  
     
    
 
@@ -166,9 +161,24 @@ object Anagrams {
    *
    *  Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = sentence match {
-    case List() => List(Nil)
-    case _ => ???
-  }
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+    def sentenceAnagrams(occurences: Occurrences): List[Sentence] = {
+      if(occurences.isEmpty) List(Nil)
+      else {
+        anagrams(occurences)
+      }
+    }    
+    
+     def anagrams(occurrences: Occurrences): List[Sentence] = {
+       for{
+         combination <- combinations(occurrences) 
+         word <- dictionaryByOccurrences.getOrElse(combination, Nil)
+         rest <- sentenceAnagrams(subtract(occurrences, wordOccurrences(word)))
+       } yield word :: rest
+     }
+    
+    sentenceAnagrams(sentenceOccurrences(sentence))
+  }  
+  
 
 }
