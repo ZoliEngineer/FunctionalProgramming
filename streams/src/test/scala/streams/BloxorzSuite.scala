@@ -52,16 +52,40 @@ class BloxorzSuite extends FunSuite {
       assert(startPos == Pos(1,1))
     }
   }
+  
+  test("neighbours with history"){
+    new Level1 {
+      assert(neighborsWithHistory(Block(Pos(1,1),Pos(1,1)), List(Left,Up)).toSet
+          === Set(
+		  (Block(Pos(1,2),Pos(1,3)), List(Right,Left,Up)),
+		  (Block(Pos(2,1),Pos(3,1)), List(Down,Left,Up))
+		))
+    }
+  }
+  
+    test("new neighbors only"){
+    new Level1 {
+      assert(
+          newNeighborsOnly(
+			  Set(
+			    (Block(Pos(1,2),Pos(1,3)), List(Right,Left,Up)),
+			    (Block(Pos(2,1),Pos(3,1)), List(Down,Left,Up))
+			  ).toStream,			
+			  Set(Block(Pos(1,2),Pos(1,3)), Block(Pos(1,1),Pos(1,1)))).toSet
+		 ===  Set((Block(Pos(2,1),Pos(3,1)), List(Down,Left,Up))))
+    }
+  }
+  
 
   test("optimal solution for level 1") {
     new Level1 {
-      assert(solve(solution) == Block(goal, goal))
+      assert(solve(solution) === Block(goal, goal))
     }
   }
 
   test("optimal solution length for level 1") {
     new Level1 {
-      assert(solution.length == optsolution.length)
+      assert(solution.length === optsolution.length)
     }
   }
 }
